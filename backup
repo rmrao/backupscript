@@ -1,0 +1,51 @@
+#!/bin/bash
+# Read input from ~/.backupinfo, sync to folder specified in arg1. If "b_test -add FILE", write to ~/.backupinfo
+
+if [[ $# -eq 2 ]]; then
+	[[ $1 == "-add" || $1 == "--add" ]] || { echo "$1: Unknown option" >&2; echo "Usage: b_test TARGETFOLDER or b_test -add NEWFOLDER" >&2; exit 1; }
+	[[ -e ~/.backupinfo ]] || touch ~/.backupinfo
+	[[ -r ~/.backupinfo && -w ~/.backupinfo ]] || { echo "$HOME/.backupinfo: Permission denied" >&2; exit 1; }
+	# Add file to ~/.backupinfo
+	ADDFILE="$2"
+	echo "Adding $ADDFILE to ~/.backupinfo"
+	IFS=$'\r\n' read -d '' -r -a FILES < ~/.backupinfo
+	_numfiles=${#FILES[@]}
+	for (( i = 0; i < $_numfiles; i++ )) do
+		FILES[$i]="${FILES[$i]:2:${#FILES[$i]}}"
+	done
+	IFS=$'/ ' read -r -a FPATH <<< "$ADDFILE"
+	_path="${FPATH[0]}"
+	for (( i = 0; i < ${#FPATH[@]}; i++ )) do
+		if [[ $i+1 -eq ${#FPATH[@]} && ${ADDFILE:${#ADDFILE}-1:1} != '/' ]]; then
+			[[ " ${FILES[@]}" =~ "$_path " ]] || break
+		else
+			[[ " ${FILES[@]}" =~ "$_path/ " ]] || break
+		fi
+		_path="$_path/${FPATH[$i+1]}"
+	done
+	for (( k = 0; k < $_numfiles-1; k++ )) do
+		echo "+ ${FILES[$k]}"
+	done > ~/.backupinfo
+	for (( j = $i; j < ${#FPATH[@]}; j++ )) do
+		[[ $j+1 -eq ${#FPATH[@]} ]] && echo "+ $_path" || echo "+ $_path/"
+		_path="$_path/${FPATH[$j+1]}"
+	done >> ~/.backupinfo
+	echo "- *" >> ~/.backupinfo
+
+elif [[ $# -eq 1 ]]; then
+	[[ -e $1 ]] || { echo "$1: Directory does not exist" >&2; exit 1; }
+	[[ -d $1 ]] || { echo "$1: Not a directory" >&2; exit 1; }
+	[[ -w $1 ]] || { echo "$1: Permission denied" >&2; exit 1; }
+	# Start backup
+	_now=$(date +"%m/%d/%Y")
+	_time=$(date +"%T")
+	echo "Starting backup on $_now at $_time..."
+	rsync -av --include-from=$HOME/.backupinfo $HOME/ "$1"
+	_time=$(date +"%T")
+	echo "Finished at $_time"
+else
+	echo "Usage: b_test TARGETFOLDER or b_test -add NEWFOLDER" >&2
+	exit 1
+fi
+
+
