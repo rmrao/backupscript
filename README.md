@@ -19,7 +19,7 @@ If you want to backup to a folder, for example `"~/Google Drive/backup"`, simply
 
 	backup "~/Google Drive/backup"
 
-Note: the quotes are necessary if there is a space in the name (alternatively you can use `\ `). The script by default logs output to stdout. If you wish to create a log instead, simply redirect the output like so:
+Note: the quotes are necessary if there is a space in the name (alternatively you can use `'\ '`). The script by default logs output to stdout. If you wish to create a log instead, simply redirect the output like so:
 
 	backup "~/Google Drive/backup" > "~/Google Drive/backup/log.txt"
 
