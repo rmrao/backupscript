@@ -31,7 +31,7 @@ One excellent way of utilizing this script is by adding it to your crontab. The 
 This should open an editor, where you can add:
 
 	MAILTO=''
-	0 * * * * backup BACKUP_FOLDER > BACKUP_FOLDER/log.txt
+	0 * * * * /<path to script>/backup BACKUP_FOLDER > BACKUP_FOLDER/log.txt
 
 This will execute the script every hour. The `MAILTO=''` suppresses the mail sent by the cron daemon upon execution of the script.
 
