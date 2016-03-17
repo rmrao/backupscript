@@ -1,5 +1,5 @@
 #!/bin/bash
-# Read input from ~/.backupinfo, sync to folder specified in arg1. If "b_test -add FILE", write to ~/.backupinfo
+# Read input from ~/.backupinfo, sync to folder specified in arg1. If "backup -add FILE", write to ~/.backupinfo
 
 if [[ $# -eq 2 ]]; then
 	[[ $1 == "-add" || $1 == "--add" ]] || { echo "$1: Unknown option" >&2; echo "Usage: b_test TARGETFOLDER or b_test -add NEWFOLDER" >&2; exit 1; }
